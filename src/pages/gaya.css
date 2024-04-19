@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+:root {
+    --toastify-color-progress-light: teal; /* For light theme */
+    --toastify-color-progress-dark: teal;  /* For dark theme */
+}
+
+/* CSS to hide number input spinners */
+.no-spinners::-webkit-inner-spin-button,
+.no-spinners::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.no-spinners {
+    -moz-appearance: textfield; /* For Firefox */
+}
+
+/* In your Tailwind CSS file */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(-25%); }
+    50% { transform: translateY(0); }
+}
+
+
+
+
