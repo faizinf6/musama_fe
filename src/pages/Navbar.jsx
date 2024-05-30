@@ -1,15 +1,14 @@
-import { Fragment } from 'react'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon,UserCircleIcon } from '@heroicons/react/24/outline'
-import logo from '../logo_ppds.png'
-import axios from "axios";
-import {useLocation, useNavigate,Link } from "react-router-dom";
-import './gaya.css'
-import baseURL from "../config.js";
-
+import { Fragment } from 'react';
+import { Disclosure, Menu, Transition } from '@headlessui/react';
+import { Bars3Icon, XMarkIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import logo from '../logo_ppds.png';
+import axios from 'axios';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import './gaya.css';
+import baseURL from '../config.js';
 
 function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
+    return classes.filter(Boolean).join(' ');
 }
 
 export default function Navbar() {
@@ -17,15 +16,13 @@ export default function Navbar() {
     const location = useLocation();
 
     const handleLogout = async () => {
-        await axios.post(`${baseURL}/logout`)
-        localStorage.clear();
-        navigate('/auth');
-        // Lakukan tindakan selanjutnya, misal mengarahkan ke halaman login
-    };
-
-
-    const handleNavigation = (route) => {
-        navigate(route);
+        try {
+            await axios.post(`${baseURL}/logout`);
+            localStorage.clear();
+            navigate('/auth');
+        } catch (error) {
+            console.error('Logout failed', error);
+        }
     };
 
     return (
@@ -47,12 +44,8 @@ export default function Navbar() {
                                 </Disclosure.Button>
                             </div>
                             <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                                <div className="flex flex-shrink-0 items-center" onClick={()=>navigate("/beranda")}>
-                                    <img
-                                        className="h-10 w-auto"
-                                        src= {logo}
-                                        alt="Darussaadah"
-                                    />
+                                <div className="flex flex-shrink-0 items-center" onClick={() => navigate('/beranda')}>
+                                    <img className="h-10 w-auto" src={logo} alt="Darussaadah" />
                                 </div>
                                 <div className="hidden sm:ml-6 sm:block">
                                     <div className="flex space-x-4">
@@ -62,22 +55,16 @@ export default function Navbar() {
                                         <NavigationLink route="/taftisan" name="Panel Ujian" currentPath={location.pathname} />
                                         <NavigationLink route="/profil-pengguna" name="Akun" currentPath={location.pathname} />
                                     </div>
-
                                 </div>
                             </div>
                             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-
-
                                 {/* Profile dropdown */}
                                 <Menu as="div" className="relative ml-3">
                                     <div>
                                         <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm">
                                             <span className="absolute -inset-1.5" />
                                             <span className="sr-only">Open user menu</span>
-                                            <UserCircleIcon
-                                                className="h-8 w-8 rounded-full bg-amber-50"
-                                                alt=""
-                                            />
+                                            <UserCircleIcon className="h-8 w-8 rounded-full bg-amber-50" alt="" />
                                         </Menu.Button>
                                     </div>
                                     <Transition
@@ -93,14 +80,13 @@ export default function Navbar() {
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <a
-                                                        onClick={()=>navigate('/profil-pengguna')}
+                                                        onClick={() => navigate('/profil-pengguna')}
                                                         className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                                                     >
                                                         {JSON.parse(localStorage.getItem('user')).nama_admin || 'Pengguna'}
                                                     </a>
                                                 )}
                                             </Menu.Item>
-
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <a
@@ -117,7 +103,6 @@ export default function Navbar() {
                             </div>
                         </div>
                     </div>
-
                     <Disclosure.Panel className="sm:hidden ">
                         <div className="space-y-1 px-2 pb-3 pt-2">
                             <NavigationLink route="/beranda" name="Beranda" currentPath={location.pathname} />
@@ -130,9 +115,8 @@ export default function Navbar() {
                 </>
             )}
         </Disclosure>
-    )
+    );
 }
-
 
 function NavigationLink({ route, name, currentPath }) {
     return (

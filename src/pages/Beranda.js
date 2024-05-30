@@ -14,11 +14,14 @@ import {useEffect} from "react";
 function Beranda() {
 
     const navigate = useNavigate();
-
+    const user = JSON.parse(localStorage.getItem('user'));
 
     return (
       <div>
           <Navbar/>
+          <div className="flex flex-col items-center justify-center bg-gray-100">
+              <h1 className="text-2xl font-bold">Welcome, {user?.nama_admin}</h1>
+          </div>
 
           <Tab.Group>
               <Tab.List className="flex m-2 p-1.5  bg-green-800 rounded-xl">
