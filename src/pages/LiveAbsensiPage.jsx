@@ -17,11 +17,9 @@ const KehadiranModal = ({ isOpen, onClose, student, activity, status, onSave }) 
         if (isOpen) {
             setInitialStatus(status || 'ALPA');
             setSelectedStatus(status || 'ALPA');
-            setNewEditorName(student.absensi.data_editor.nama_admin)
-
-
+            setNewEditorName(student.absensi.data_editor.nama_admin);
         }
-    }, [isOpen, status]);
+    }, [isOpen, status, student]);
 
     const handleSave = () => {
         const user = JSON.parse(localStorage.getItem('user'));
@@ -40,16 +38,15 @@ const KehadiranModal = ({ isOpen, onClose, student, activity, status, onSave }) 
             id_kegiatan: activity.id,
             nis_santri: student.nis_santri,
             tanggal: "2024-04-01",
-            editor:user.nis,
-            status_absensi: selectedStatus.toUpperCase()
+            status_absensi: selectedStatus.toUpperCase(),
+            data_editor: { nama_admin: user.nama_admin },
         };
-        console.log(user)
+
         axios.patch(`${baseURL}/update-absensi`, data)
             .then(() => {
                 console.log("BERHASIL");
-                onSave(selectedStatus);
+                onSave(selectedStatus, user.nama_admin, dateTimeWithTimezone);
                 onClose();
-                setNewEditorName(user.nama_admin)
             })
             .catch(err => {
                 console.error(err);
@@ -63,12 +60,13 @@ const KehadiranModal = ({ isOpen, onClose, student, activity, status, onSave }) 
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
             <div className="bg-white rounded-lg p-6">
                 <h2 className="text-xl font-bold">Edit Data Kehadiran</h2>
-                <h3 className="mt-2 mb-3">{student.santriDetail.nama_santri}</h3>
-                {/*last editor name*/}
-                <h3 className="mt-1 mb-1">{`Data terakhir diubah Oleh: ${newEditorName}`}</h3>
-                {/*last status*/}
+                <h3 className="mt-2 mb-3 font-black">{student.santriDetail.nama_santri}</h3>
+                {/* Last editor name */}
+                <h3 className="mt-1 mb-1">{`Data terakhir diubah oleh:`}</h3>
+                <h3 className="mt-1 mb-2">{` ${newEditorName}`}</h3>
+                {/* Last status */}
                 <h3 className="mt-1 mb-1">{`Status Kehadiran terakhir: ${initialStatus}`}</h3>
-                {/*last edit time*/}
+                {/* Last edit time */}
                 <h3 className="mt-1 mb-1">{`Waktu: ${student.absensi.last_edit}`}</h3>
 
                 <h3 className="mt-5 mb-2">Silahkan pilih status kehadiran (Baru):</h3>
@@ -100,7 +98,7 @@ export const LiveAbsensiPage = () => {
     const [schoolName, setSchoolName] = useState(localStorage.getItem('schoolName') || 'Semua');
     const [activity, setActivity] = useState(JSON.parse(localStorage.getItem('activity')) || null);
     const [classes, setClasses] = useState(JSON.parse(localStorage.getItem('classes')) || null);
-    const [academicYear, setAcademicYear] = useState(localStorage.getItem('academicYear') || `${new Date().getFullYear()-1}-${new Date().getFullYear()}`);
+    const [academicYear, setAcademicYear] = useState(localStorage.getItem('academicYear') || `${new Date().getFullYear() - 1}-${new Date().getFullYear()}`);
     const [attendanceData, setAttendanceData] = useState([]);
     const [intervalId, setIntervalId] = useState(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -168,7 +166,6 @@ export const LiveAbsensiPage = () => {
         const normalizedClassInstitution = classes.kelas.replace(/\s+/g, '%20').toLowerCase();
         const url = `${baseURL}/get-absensi/2024-04-01/${activity.id}/${schoolName}/${normalizedClassInstitution}/${academicYear}/${1}`;
         console.log("Fetching data from server...");
-        console.log(url)
         axios.get(url).then(res => {
             setAttendanceData(res.data);
             setIsButtonDisabled(true);
@@ -205,10 +202,18 @@ export const LiveAbsensiPage = () => {
         setSelectedStudent(null);
     };
 
-    const handleModalSave = (status) => {
+    const handleModalSave = (status, editorName, lastEdit) => {
         setAttendanceData(prevData => prevData.map(item =>
             item.nis_santri === selectedStudent.nis_santri
-                ? { ...item, absensi: { ...item.absensi, status_absensi: status } }
+                ? {
+                    ...item,
+                    absensi: {
+                        ...item.absensi,
+                        status_absensi: status,
+                        data_editor: { nama_admin: editorName },
+                        last_edit: lastEdit
+                    }
+                }
                 : item));
     };
 
@@ -278,12 +283,11 @@ export const LiveAbsensiPage = () => {
             </div>
         </div>
     );
-
 };
 
 const Dropdown = ({ label, value, options, onChange }) => (
     <div className="my-1">
-        <label className="block ml-1  text-xs text-gray-500">{label}</label>
+        <label className="block ml-1 text-xs text-gray-500">{label}</label>
         <div className="relative">
             <select
                 className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline"
@@ -302,8 +306,6 @@ const Dropdown = ({ label, value, options, onChange }) => (
     </div>
 );
 
-
-
 const AttendanceTable = ({ data, onKehadiranClick }) => {
     const statusColors = {
         ALPA: 'bg-red-500 text-white',
@@ -321,8 +323,6 @@ const AttendanceTable = ({ data, onKehadiranClick }) => {
                 <th className="py-3 border-b border-gray-200 bg-teal-400 text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
                 <th className="py-1 border-b border-gray-200 bg-teal-400 text-xs font-semibold text-gray-600 uppercase tracking-wider">Class</th>
                 <th className="py-3 border-b border-gray-200 bg-teal-400 text-xs font-semibold text-gray-600 uppercase tracking-wider">Kehadiran</th>
-                {/*<th className="py-3 border-b border-gray-200 bg-teal-400 text-xs font-semibold text-gray-600 uppercase tracking-wider">L/P</th>*/}
-                {/*<th className="py-3 border-b border-gray-200 bg-teal-400 text-xs font-semibold text-gray-600 uppercase tracking-wider">NIS</th>*/}
             </tr>
             </thead>
             <tbody>
@@ -338,8 +338,6 @@ const AttendanceTable = ({ data, onKehadiranClick }) => {
                             {item.absensi?.status_absensi || 'Unknown'}
                         </button>
                     </td>
-                    {/*<td className="px-2 py-3 border-b border-gray-200 text-sm">{item.santriDetail.gender}</td>*/}
-                    {/*<td className="px-5 py-3 border-b border-gray-200 text-sm">{item.nis_santri}</td>*/}
                 </tr>
             ))}
             </tbody>

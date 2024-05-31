@@ -170,7 +170,7 @@ function Beranda() {
 
                           </div>
                       </a>
-                      <a onClick={()=>{navigate('/data-murid') }}>
+                      <a onClick={()=>{navigate('/jadwal-kegiatan') }}>
                           <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-red-500">
                               <div className="shrink-0">
                                   <CalendarDaysIcon className="h-10 w-10 text-red-500" aria-hidden="true" />
@@ -178,7 +178,7 @@ function Beranda() {
                               </div>
 
                               <div>
-                                  <div className="text-xl font-medium text-black">Kalender Libur</div>
+                                  <div className="text-xl font-medium text-black">Jadwal Kegiatan</div>
                                   <p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>
                               </div>
 
