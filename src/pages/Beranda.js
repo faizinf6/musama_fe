@@ -3,7 +3,7 @@ import {Tab} from "@headlessui/react";
 import {
     CalculatorIcon, CalendarDaysIcon,
     ChartPieIcon,
-    ClipboardDocumentCheckIcon, ClipboardDocumentListIcon, CodeBracketIcon, EnvelopeOpenIcon,
+    ClipboardDocumentCheckIcon, ClipboardDocumentListIcon, ClockIcon, CodeBracketIcon, EnvelopeOpenIcon,
     PresentationChartBarIcon,
     PresentationChartLineIcon, ShieldCheckIcon, SignalIcon,
     UserGroupIcon, UsersIcon
@@ -19,8 +19,8 @@ function Beranda() {
     return (
       <div>
           <Navbar/>
-          <div className="flex flex-col items-center justify-center bg-gray-100">
-              <h1 className="text-2xl font-bold">Welcome, {user?.nama_admin}</h1>
+          <div className="flex flex-col items-center justify-center">
+              <h1 className="text-l italic font-bold mt-4">Selamat datang, {user?.nama_admin}</h1>
           </div>
 
           <Tab.Group>
@@ -146,7 +146,7 @@ function Beranda() {
                       <a onClick={()=>{navigate('/data-murid') }}>
                           <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-red-500">
                               <div className="shrink-0">
-                                  <SignalIcon className="h-10 w-10 text-red-500" aria-hidden="true" />
+                                  <CalculatorIcon className="h-10 w-10 text-red-500" aria-hidden="true" />
 
                               </div>
 
@@ -173,12 +173,27 @@ function Beranda() {
                       <a onClick={()=>{navigate('/jadwal-kegiatan') }}>
                           <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-red-500">
                               <div className="shrink-0">
-                                  <CalendarDaysIcon className="h-10 w-10 text-red-500" aria-hidden="true" />
+                                  <ClockIcon className="h-10 w-10 text-red-500" aria-hidden="true" />
 
                               </div>
 
                               <div>
                                   <div className="text-xl font-medium text-black">Jadwal Kegiatan</div>
+                                  <p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>
+                              </div>
+
+                          </div>
+                      </a>
+
+                      <a onClick={()=>{navigate('/kalender-libur') }}>
+                          <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-red-500">
+                              <div className="shrink-0">
+                                  <CalendarDaysIcon className="h-10 w-10 text-red-500" aria-hidden="true" />
+
+                              </div>
+
+                              <div>
+                                  <div className="text-xl font-medium text-black">Pengaturan Hari Libur</div>
                                   <p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>
                               </div>
 

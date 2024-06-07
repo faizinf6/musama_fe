@@ -11,6 +11,10 @@ export const fetchKelasLembaga = async () => {
     const response = await axios.get(`${baseURL}/all-kelaslembaga`);
     return response.data;
 };
+export const fetchKegiatan = async () => {
+    const response = await axios.get(`${baseURL}/all-kegiatan`);
+    return response.data;
+};
 
 export const createKegiatan = async (data) => {
     const response = await axios.post(`${baseURL}/create-kegiatan`, data);

@@ -59,7 +59,7 @@ const convertAndSendExcelData = (file) => {
 
         axios.post('http://localhost:5000/create-santri-banyak', json_data)
             .then(response => {console.log('Upload successful:', response)
-                toast.success("Berhasil!",{autoClose:3000})
+                toast.success("Berhasil!",{autoClose:1000})
             })
             .catch(error => console.error('Upload failed:', error));
     };
@@ -80,7 +80,10 @@ export const PanelAdmin = () => {
     const uploadFile = () => {
         if (file) {
             convertAndSendExcelData(file);
+            setModalOpen(false)
+
         }
+
     };
 
     return (

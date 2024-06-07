@@ -7,6 +7,9 @@ import axios from 'axios';
 import baseURL from "../config";
 import Navbar from "./Navbar";
 import {ToastContainer} from "react-toastify";
+import moment from 'moment-timezone';
+import DatePicker from "react-datepicker";
+
 
 const KehadiranModal = ({ isOpen, onClose, student, activity, status, onSave }) => {
     const [initialStatus, setInitialStatus] = useState(status || 'ALPA');
@@ -24,28 +27,28 @@ const KehadiranModal = ({ isOpen, onClose, student, activity, status, onSave }) 
     const handleSave = () => {
         const user = JSON.parse(localStorage.getItem('user'));
         const now = new Date();
-        const dateTimeWithTimezone = now.toLocaleString('id-ID', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false,
-            timeZone: 'Asia/Jakarta' // Replace with your desired timezone
-        });
+        const dateTimeWithTimezone = moment.tz(now, 'Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss');
+        const localDate = moment.tz(now, 'Asia/Jakarta').format('YYYY-MM-DD');
+
         const data = {
             id_kegiatan: activity.id,
             nis_santri: student.nis_santri,
-            tanggal: "2024-04-01",
+            tanggal: localDate,
             status_absensi: selectedStatus.toUpperCase(),
-            data_editor: { nama_admin: user.nama_admin },
+            editor:  user.nis ,
+            last_edit: dateTimeWithTimezone
         };
+
+        console.log(data)
+
+        // setNewEditorName(user.nama_admin);
+
 
         axios.patch(`${baseURL}/update-absensi`, data)
             .then(() => {
-                console.log("BERHASIL");
                 onSave(selectedStatus, user.nama_admin, dateTimeWithTimezone);
+                console.log("BERHASIL");
+                console.log(user.nama_admin)
                 onClose();
             })
             .catch(err => {
@@ -104,6 +107,7 @@ export const LiveAbsensiPage = () => {
     const [isButtonDisabled, setIsButtonDisabled] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(moment.tz('Asia/Jakarta').toDate());
 
     const { data: activities } = useQuery(['activities', schoolName], () =>
         axios.get(`${baseURL}/all-kegiatan`).then(res =>
@@ -163,9 +167,12 @@ export const LiveAbsensiPage = () => {
             console.error('Select all fields before processing.');
             return;
         }
+
+        const formattedSelecteddate = moment(selectedDate).tz('Asia/Jakarta').format('YYYY-MM-DD') // Format as YYYY-MM-DD
         const normalizedClassInstitution = classes.kelas.replace(/\s+/g, '%20').toLowerCase();
-        const url = `${baseURL}/get-absensi/2024-04-01/${activity.id}/${schoolName}/${normalizedClassInstitution}/${academicYear}/${1}`;
+        const url = `${baseURL}/get-absensi/${formattedSelecteddate}/${activity.id}/${schoolName}/${normalizedClassInstitution}/${academicYear}/${1}`;
         console.log("Fetching data from server...");
+        // console.log(url)
         axios.get(url).then(res => {
             setAttendanceData(res.data);
             setIsButtonDisabled(true);
@@ -193,8 +200,15 @@ export const LiveAbsensiPage = () => {
     };
 
     const handleKehadiranClick = (student) => {
-        setSelectedStudent(student);
-        setIsModalOpen(true);
+        console.log(student)
+        if (student.absensi==null)
+        {
+            console.log("data null bang")
+        }else {
+
+            setSelectedStudent(student);
+            setIsModalOpen(true);
+        }
     };
 
     const handleModalClose = () => {
@@ -261,9 +275,18 @@ export const LiveAbsensiPage = () => {
                         onChange={setAcademicYear}
                     />
                 </div>
-                <div className="flex justify-between items-center mt-4">
+                <div className="flex justify-between items-center ">
+                    <div>
+                        <label className="block ml-1 text-xs text-gray-500">Pilih Tanggal Absensi</label>
+                        <DatePicker
+                            selected={selectedDate}
+                            onChange={date => setSelectedDate(date)}
+                            dateFormat="dd-MM-yyyy"
+                            className="border p-2 rounded "
+                        />
+                    </div>
                     <button
-                        className={`px-4 py-2 rounded shadow focus:outline-none ${isButtonDisabled ? 'bg-gray-200 text-gray-300' : 'bg-blue-500 hover:bg-blue-700 text-white'}`}
+                        className={`mt-4 px-4 py-2 rounded shadow focus:outline-none ${isButtonDisabled ? 'bg-gray-200 text-gray-300' : 'bg-green-700 text-white'}`}
                         onClick={handleProses}
                         disabled={isButtonDisabled}
                     >
@@ -312,8 +335,8 @@ const AttendanceTable = ({ data, onKehadiranClick }) => {
         HADIR: 'bg-green-600 text-white',
         IZIN: 'bg-cyan-400',
         SAKIT: 'bg-yellow-400',
-        'null': 'bg-gray-500',
-        '': 'bg-gray-500'
+        'null': 'bg-gray-300',
+        '': 'bg-gray-300'
     };
 
     return (
@@ -335,7 +358,7 @@ const AttendanceTable = ({ data, onKehadiranClick }) => {
                             className={`px-5 py-2 rounded-xl shadow-lg min-w-[90px] ${statusColors[item.absensi?.status_absensi || 'null']}`}
                             onClick={() => onKehadiranClick(item)}
                         >
-                            {item.absensi?.status_absensi || 'Unknown'}
+                            {item.absensi?.status_absensi || '--'}
                         </button>
                     </td>
                 </tr>
