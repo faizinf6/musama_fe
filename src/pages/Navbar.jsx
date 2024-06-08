@@ -48,12 +48,11 @@ export default function Navbar() {
                                     <img className="h-10 w-auto" src={logo} alt="Darussaadah" />
                                 </div>
                                 <div className="hidden sm:ml-6 sm:block">
-                                    <div className="flex space-x-4">
+                                    <div className="space-y-1 px-2 pb-3 pt-2">
                                         <NavigationLink route="/beranda" name="Beranda" currentPath={location.pathname} />
-                                        <NavigationLink route="/data-murid" name="Data" currentPath={location.pathname} />
-                                        <NavigationLink route="/rekap-nilai" name="Rekap Nilai" currentPath={location.pathname} />
-                                        <NavigationLink route="/taftisan" name="Panel Ujian" currentPath={location.pathname} />
-                                        <NavigationLink route="/profil-pengguna" name="Akun" currentPath={location.pathname} />
+                                        <NavigationLink route="/live-absensi" name="Live Absensi Santri " currentPath={location.pathname} />
+                                        <NavigationLink route="/panel-admin" name="Panel Admin" currentPath={location.pathname} />
+                                        <NavigationLink route="/profil" name="Akun" currentPath={location.pathname} />
                                     </div>
                                 </div>
                             </div>
@@ -80,7 +79,7 @@ export default function Navbar() {
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <a
-                                                        onClick={() => navigate('/profil-pengguna')}
+                                                        onClick={() => navigate('/profil')}
                                                         className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                                                     >
                                                         {JSON.parse(localStorage.getItem('user')).nama_admin || 'Pengguna'}
@@ -106,10 +105,9 @@ export default function Navbar() {
                     <Disclosure.Panel className="sm:hidden ">
                         <div className="space-y-1 px-2 pb-3 pt-2">
                             <NavigationLink route="/beranda" name="Beranda" currentPath={location.pathname} />
-                            <NavigationLink route="/data-murid" name="Data" currentPath={location.pathname} />
-                            <NavigationLink route="/rekap-nilai" name="Rekap Nilai" currentPath={location.pathname} />
-                            <NavigationLink route="/taftisan" name="Panel Ujian" currentPath={location.pathname} />
-                            <NavigationLink route="/profil-pengguna" name="Akun" currentPath={location.pathname} />
+                            <NavigationLink route="/live-absensi" name="Live Absensi S " currentPath={location.pathname} />
+                            <NavigationLink route="/panel-admin" name="Panel Admin" currentPath={location.pathname} />
+                            <NavigationLink route="/profil" name="Akun" currentPath={location.pathname} />
                         </div>
                     </Disclosure.Panel>
                 </>

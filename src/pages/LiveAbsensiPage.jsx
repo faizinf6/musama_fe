@@ -152,6 +152,12 @@ export const LiveAbsensiPage = () => {
         setIsButtonDisabled(false);
         console.log('Updated activity:', newActivity);
     };
+    const handleDateChange = (newDate) => {
+        setSelectedDate(newDate)
+        clearInterval(intervalId);
+        setIsButtonDisabled(false);
+        setIntervalId(null);
+    };
 
     const handleClassChange = (newClassId) => {
         const newClass = classesData.find(c => c.id === parseInt(newClassId));
@@ -280,7 +286,7 @@ export const LiveAbsensiPage = () => {
                         <label className="block ml-1 text-xs text-gray-500">Pilih Tanggal Absensi</label>
                         <DatePicker
                             selected={selectedDate}
-                            onChange={date => setSelectedDate(date)}
+                            onChange={handleDateChange}
                             dateFormat="dd-MM-yyyy"
                             className="border p-2 rounded "
                         />
@@ -343,8 +349,8 @@ const AttendanceTable = ({ data, onKehadiranClick }) => {
         <table className="min-w-full leading-normal border-separate text-center whitespace-nowrap" style={{ borderSpacing: '0 20px' }}>
             <thead>
             <tr>
-                <th className="py-3 border-b border-gray-200 bg-teal-400 text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
-                <th className="py-1 border-b border-gray-200 bg-teal-400 text-xs font-semibold text-gray-600 uppercase tracking-wider">Class</th>
+                <th className="py-3 border-b border-gray-200 bg-teal-400 text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama</th>
+                <th className="py-1 border-b border-gray-200 bg-teal-400 text-xs font-semibold text-gray-600 uppercase tracking-wider">Kelas</th>
                 <th className="py-3 border-b border-gray-200 bg-teal-400 text-xs font-semibold text-gray-600 uppercase tracking-wider">Kehadiran</th>
             </tr>
             </thead>

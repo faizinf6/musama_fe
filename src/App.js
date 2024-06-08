@@ -7,6 +7,8 @@ import {Auth} from "./pages/Auth";
 import {JadwalKegiatanPage} from "./pages/JadwalKegiatanPage";
 import KalenderLiburPage from "./pages/KalenderLiburPage";
 import AuthRedirect from "./pages/AuthRedirect";
+import {UserProfilePage} from "./pages/UserProfilePage";
+import RekapAbsensiPage from "./pages/RekapAbsensiPage";
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
                  <Route path="/auth" element={< Auth/>} />
                  <Route path="/jadwal-kegiatan" element={< JadwalKegiatanPage/>} />
                  <Route path="/kalender-libur" element={< KalenderLiburPage/>} />
+                 <Route path="/profil" element={< UserProfilePage/>} />
+                 <Route path="/rekap-absensi" element={< RekapAbsensiPage/>} />
              </Routes>
 
          </BrowserRouter>

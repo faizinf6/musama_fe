@@ -57,11 +57,12 @@ function Beranda() {
 
                               <div>
                                   <div className="text-xl font-medium text-black">Data Santri</div>
-                                  <p className="text-slate-500">Lihat, Cari dan edit Data Santri  </p>
+                                  {/*<p className="text-slate-500">Lihat, Cari dan edit Data Santri  </p>*/}
                               </div>
 
                           </div>
                       </a>
+
                       <a onClick={()=>{navigate('/live-absensi') }}>
                           <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-cyan-500">
                               <div className="shrink-0">
@@ -71,12 +72,12 @@ function Beranda() {
 
                               <div>
                                   <div className="text-xl font-medium text-black">Live Absensi / Presensi</div>
-                                  <p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>
+                                  <p className="text-slate-500"> </p>
                               </div>
 
                           </div>
                       </a>
-                      <a onClick={()=>{navigate('/data-murid') }}>
+                      <a onClick={()=>{navigate('/rekap-absensi') }}>
                           <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-cyan-500">
                               <div className="shrink-0">
                                   <PresentationChartLineIcon className="h-10 w-10 text-cyan-500" aria-hidden="true" />
@@ -85,7 +86,7 @@ function Beranda() {
 
                               <div>
                                   <div className="text-xl font-medium text-black">Rekap & Laporan</div>
-                                  <p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>
+                                  {/*<p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>*/}
                               </div>
 
                           </div>
@@ -151,25 +152,13 @@ function Beranda() {
                               </div>
 
                               <div>
-                                  <div className="text-xl font-medium text-black">Status Mesin Absen</div>
-                                  <p className="text-slate-500">Tambah, Hapus dan Edit Data Guru disini </p>
+                                  <div className="text-xl font-medium text-black">Status Mesin Absensi</div>
+                                  {/*<p className="text-slate-500">Informasi Status Mesin Absensi Musama </p>*/}
                               </div>
 
                           </div>
                       </a>
-                      <a onClick={()=>{navigate('/panel-admin') }}>
-                          <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-red-500">
-                              <div className="shrink-0">
-                                  <ShieldCheckIcon className="h-10 w-10 text-red-500" aria-hidden="true" />
-                              </div>
 
-                              <div>
-                                  <div className="text-xl font-medium text-black">Panel Admin</div>
-                                  <p className="text-slate-500">Halaman Khusus Admin atau pengurus yang diberi izin</p>
-                              </div>
-
-                          </div>
-                      </a>
                       <a onClick={()=>{navigate('/jadwal-kegiatan') }}>
                           <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-red-500">
                               <div className="shrink-0">
@@ -179,7 +168,7 @@ function Beranda() {
 
                               <div>
                                   <div className="text-xl font-medium text-black">Jadwal Kegiatan</div>
-                                  <p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>
+                                  {/*<p className="text-slate-500">Atur Jadwal Kegiatan perlembaga</p>*/}
                               </div>
 
                           </div>
@@ -194,27 +183,40 @@ function Beranda() {
 
                               <div>
                                   <div className="text-xl font-medium text-black">Pengaturan Hari Libur</div>
-                                  <p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>
+                                  {/*<p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>*/}
                               </div>
 
                           </div>
                       </a>
 
-                      <a onClick={()=>{navigate('/data-murid') }}>
+                      {/*<a onClick={()=>{navigate('/data-murid') }}>*/}
+                      {/*    <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-red-500">*/}
+                      {/*        <div className="shrink-0">*/}
+                      {/*            <PresentationChartLineIcon className="h-10 w-10 text-red-500" aria-hidden="true" />*/}
+
+                      {/*        </div>*/}
+
+                      {/*        <div>*/}
+                      {/*            <div className="text-xl font-medium text-black">Rekap & Laporan</div>*/}
+                      {/*            <p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>*/}
+                      {/*        </div>*/}
+
+                      {/*    </div>*/}
+                      {/*</a>*/}
+
+                      <a onClick={()=>{navigate('/panel-admin') }}>
                           <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-red-500">
                               <div className="shrink-0">
-                                  <PresentationChartLineIcon className="h-10 w-10 text-red-500" aria-hidden="true" />
-
+                                  <ShieldCheckIcon className="h-10 w-10 text-red-500" aria-hidden="true" />
                               </div>
 
                               <div>
-                                  <div className="text-xl font-medium text-black">Rekap & Laporan</div>
-                                  <p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>
+                                  <div className="text-xl font-medium text-black">Panel Admin</div>
+                                  <p className="text-slate-500">Halaman Khusus Admin atau pengurus yang diberi izin</p>
                               </div>
 
                           </div>
                       </a>
-
 
 
 
