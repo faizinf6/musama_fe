@@ -14,7 +14,7 @@
     }
     .custom-table th,
     .custom-table td {
-        padding: 10px;
+        padding: 12px ;
         line-height: 1 !important; /* Ensure consistent line height */
         text-align: center; /* Center horizontally */
         vertical-align: middle; /* Center vertically */

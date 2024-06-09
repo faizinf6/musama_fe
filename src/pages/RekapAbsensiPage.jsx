@@ -6,7 +6,7 @@ import html2canvas from 'html2canvas';
 import * as XLSX from 'xlsx';
 import '../index.css';
 import Navbar from "./Navbar";
-import {ToastContainer} from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import baseURL from "../config";
 
 const RekapAbsensiPage = () => {
@@ -41,7 +41,10 @@ const RekapAbsensiPage = () => {
         'IZIN': 'I',
         'null': '-'
     };
-
+    const singkatanMap = {
+        'MADIN':'Madrasah Diniyah Darussaadah',
+        'MTS':'Madrasah Tsanawiyah Assaadah',
+    };
 
     useEffect(() => {
         if (kelasData) {
@@ -62,7 +65,6 @@ const RekapAbsensiPage = () => {
             if (filteredKegiatan.length > 0) {
                 setSelectedKegiatan(filteredKegiatan[0].id);
                 setNamaSelectedKegiatan(filteredKegiatan[0].nama_kegiatan);
-
             } else {
                 setSelectedKegiatan('');
                 setNamaSelectedKegiatan('');
@@ -94,11 +96,22 @@ const RekapAbsensiPage = () => {
     };
 
     const handleSave = () => {
-        const table = document.getElementById('attendanceTable');
+        const table = document.getElementById('attendanceTableContainer');
+        const tableContainer = document.getElementById('attendanceTableContainer');
+        const tableContainerWidth = tableContainer.scrollWidth;
+        const tableContainerHeight = tableContainer.scrollHeight;
+        const tableContainerScrollX = tableContainer.scrollLeft;
+        const tableContainerScrollY = tableContainer.scrollTop;
+
+
         if (saveFormat === 'image') {
             html2canvas(table, {
                 scale: 4,
-                useCORS: true
+                useCORS: true,
+                width: tableContainerWidth,
+                height: tableContainerHeight,
+                x: -tableContainerScrollX,
+                y: -tableContainerScrollY
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'attendanceTable.png';
@@ -111,126 +124,140 @@ const RekapAbsensiPage = () => {
         }
     };
 
-
     return (
         <div>
-            <Navbar></Navbar>
-            <ToastContainer></ToastContainer>
+            <Navbar />
+            <ToastContainer />
 
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Rekap Absensi</h1>
-            <div className={`grid grid-cols-2 gap-2 mt-4`}>
-                <div className="">
-                    <label className="block mb-1 ml-1 text-xs text-gray-500">Institusi</label>
-                    <select value={institution} onChange={e => setInstitution(e.target.value)} className="p-2 border rounded w-full bg-white">
-                        <option value="SDI">SDI</option>
-                        <option value="MTS">MTS</option>
-                        <option value="Ma">MA</option>
-                        <option value="MADIN">MADIN</option>
-                    </select>
-                </div>
-                <div className="">
-                    <label className="block mb-1 ml-1 text-xs text-gray-500">Tahun Ajaran</label>
-                    <select value={academicYear} onChange={e => setAcademicYear(e.target.value)} className="p-2 border rounded w-full bg-white">
-                        <option value="2023-2024">2023-2024</option>
-                        <option value="2024-2025">2024-2025</option>
-                        <option value="2025-2026">2025-2026</option>
-                    </select>
-                </div>
-                <div className="">
-                    <label className="block mb-1 ml-1 text-xs text-gray-500">Kelas</label>
-                    <select value={selectedKelas} onChange={e => setSelectedKelas(e.target.value)} className="p-2 border rounded w-full bg-white">
-                        {kelas.map(k => (
-                            <option key={k.id} value={k.kelas}>{k.kelas}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className="">
-                    <label className="block mb-1 ml-1 text-xs text-gray-500">Kegiatan</label>
-                    <select value={selectedKegiatan} onChange={e => {
-                        setSelectedKegiatan(e.target.value)
-                        setNamaSelectedKegiatan(e.target.value);
-
-                    }} className="p-2 border rounded w-full bg-white">
-                        {kegiatan.map(k => (
-                            <option key={k.id} value={k.id}>{k.nama_kegiatan}</option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="">
-                    <label className="block mb-1 ml-1 text-xs text-gray-500">Bulan</label>
-                    <select value={month} onChange={e => setMonth(e.target.value)} className="p-2 border rounded w-full bg-white">
-                        {months.map((m, idx) => (
-                            <option key={idx} value={m}>{m}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className="">
-                    <label className="block mb-1 ml-1 text-xs text-gray-500">Tahun</label>
-                    <select value={year} onChange={e => setYear(e.target.value)} className="p-2 border rounded w-full bg-white">
-                        {years.map((y, idx) => (
-                            <option key={idx} value={y}>{y}</option>
-                        ))}
-                    </select>
-                </div>
-
-
-            </div>
-
-            <div className="my-4">
-                <button onClick={handleFetchAttendance} className="p-2 bg-blue-500 text-white rounded">Proses</button>
-            </div>
-            {attendanceData.length > 0 && (
-                <div className="mb-4 ">
-                    <div>
-                        <h1>Absensi {selectedNamaKegiatan}</h1>
-
-                    <table id="attendanceTable" className="table-auto w-full p-4 custom-table border-2 border-black">
-                        <thead className={`bg-yellow-300 `}>
-                        <tr>
-                            <th className="py-1 border border-black  text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">Nama Santri</th>
-                            {Array.from({ length: daysInMonth }, (_, i) => (
-                                <th key={i} className="py-1 border border-black  text-xs font-semibold text-black uppercase whitespace-nowrap">{i + 1}</th>
+            <div className="container mx-auto p-4">
+                <h1 className="text-2xl font-bold mb-4">Rekap Absensi</h1>
+                <div className={`grid grid-cols-2 gap-2 mt-4`}>
+                    <div className="">
+                        <label className="block mb-1 ml-1 text-xs text-gray-500">Institusi</label>
+                        <select value={institution} onChange={e => setInstitution(e.target.value)} className="p-2 border rounded w-full bg-white">
+                            <option value="SDI">SDI</option>
+                            <option value="MTS">MTS</option>
+                            <option value="Ma">MA</option>
+                            <option value="MADIN">MADIN</option>
+                        </select>
+                    </div>
+                    <div className="">
+                        <label className="block mb-1 ml-1 text-xs text-gray-500">Tahun Ajaran</label>
+                        <select value={academicYear} onChange={e => setAcademicYear(e.target.value)} className="p-2 border rounded w-full bg-white">
+                            <option value="2023-2024">2023-2024</option>
+                            <option value="2024-2025">2024-2025</option>
+                            <option value="2025-2026">2025-2026</option>
+                        </select>
+                    </div>
+                    <div className="">
+                        <label className="block mb-1 ml-1 text-xs text-gray-500">Kelas</label>
+                        <select value={selectedKelas} onChange={e => setSelectedKelas(e.target.value)} className="p-2 border rounded w-full bg-white">
+                            {kelas.map(k => (
+                                <option key={k.id} value={k.kelas}>{k.kelas}</option>
                             ))}
-                            <th className="py-1 border  border-black text-xs font-semibold text-black uppercase whitespace-nowrap">H</th>
-                            <th className="py-1 border border-black  text-xs font-semibold text-black uppercase whitespace-nowrap">A</th>
-                            <th className="py-1 border border-black  text-xs font-semibold text-black uppercase whitespace-nowrap">S</th>
-                            <th className="py-1 border  border-black text-xs font-semibold text-black uppercase whitespace-nowrap">I</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {attendanceData.map((record, idx) => (
-                            <tr key={idx} className={`${idx%2===0 ? 'bg-white' : 'bg-gray-100'} }`}>
-                                <td className="whitespace-nowrap px-3 border border-black">{record.santri.nama_santri}</td>
-                                {Array.from({ length: daysInMonth }, (_, i) => (
-                                    <td key={i} className={`px-3 py-1 border border-black text-sm ${record.attendance_data[`day${i + 1}`] === 'HADIR' ? 'font-black text-xl' : ''}`}>{keteranganKehadiranMap[record.attendance_data[`day${i + 1}`]] || ''}</td>
-                                ))}
-                                <td className="px-3 py-1 border border-black text-sm">{record.totalHadir}</td>
-                                <td className="px-3 py-1 border border-black text-sm">{record.totalAlpa}</td>
-                                <td className="px-3 py-1 border border-black text-sm">{record.totalSakit}</td>
-                                <td className="px-3 py-1 border border-black text-sm">{record.totalIzin}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-
+                        </select>
                     </div>
-                    <div className="mt-4">
-                        <label className="block mb-2">Save Format</label>
-                        <div className="mb-4">
-                            <label className="mr-4">
-                                <input type="radio" value="image" checked={saveFormat === 'image'} onChange={() => setSaveFormat('image')} /> Image
-                            </label>
-                            <label>
-                                <input type="radio" value="excel" checked={saveFormat === 'excel'} onChange={() => setSaveFormat('excel')} /> Excel
-                            </label>
-                        </div>
-                        <button onClick={handleSave} className="p-2 bg-green-500 text-white rounded">Simpan</button>
+                    <div className="">
+                        <label className="block mb-1 ml-1 text-xs text-gray-500">Kegiatan</label>
+                        <select value={selectedKegiatan} onChange={e => {
+                            setSelectedKegiatan(e.target.value);
+                            const selectedKeg = kegiatan.find(k => k.id === parseInt(e.target.value));
+                            setNamaSelectedKegiatan(selectedKeg ? selectedKeg.nama_kegiatan : '');
+                        }} className="p-2 border rounded w-full bg-white">
+                            {kegiatan.map(k => (
+                                <option key={k.id} value={k.id}>{k.nama_kegiatan}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="">
+                        <label className="block mb-1 ml-1 text-xs text-gray-500">Bulan</label>
+                        <select value={month} onChange={e => setMonth(e.target.value)} className="p-2 border rounded w-full bg-white">
+                            {months.map((m, idx) => (
+                                <option key={idx} value={m}>{m}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="">
+                        <label className="block mb-1 ml-1 text-xs text-gray-500">Tahun</label>
+                        <select value={year} onChange={e => setYear(e.target.value)} className="p-2 border rounded w-full bg-white">
+                            {years.map((y, idx) => (
+                                <option key={idx} value={y}>{y}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
-            )}
-        </div>
+
+                <div className="my-4">
+                    <button onClick={handleFetchAttendance} className="p-2 bg-blue-500 text-white rounded">Proses</button>
+                </div>
+                {attendanceData.length > 0 && (
+                    <div className="mb-4 ">
+                        <div id="attendanceTableContainer" className="max-w-full w-full py-2">
+                            <div id="attendanceTable" className="w-full">
+                                <div className="w-full  justify-center mb-2 mt-5">
+                                    <div className="w-full flex justify-center">
+                                        <h1 className="text-xl font-semibold flex-nowrap mb-3">
+                                            Absensi {selectedNamaKegiatan} {singkatanMap[institution]} {academicYear}
+                                        </h1>
+
+                                    </div>
+                                    <div className="w-full grid grid-cols-3 justify-center">
+                                        <h2 className="ml-1 text-l  text-gray-700  ">
+                                            Bulan {month}
+                                        </h2>
+                                        <h2 className="text-l font-semibold text-center whitespace-nowrap">
+                                            Kelas {selectedKelas}
+
+                                        </h2>
+                                    </div>
+                                </div>
+                                <table className="table-auto w-full p-4 custom-table border-2 border-black">
+                                    <thead className="bg-yellow-300">
+                                    <tr>
+                                        <th className="py-1 border border-black text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">Nama Santri</th>
+                                        {Array.from({ length: daysInMonth }, (_, i) => (
+                                            <th key={i} className="py-1 border border-black text-xs font-semibold text-black uppercase whitespace-nowrap">{i + 1}</th>
+                                        ))}
+                                        <th className="py-1 border-l-2 border border-black text-xs font-semibold text-black uppercase whitespace-nowrap">H</th>
+                                        <th className="py-1 border border-black text-xs font-semibold text-black uppercase whitespace-nowrap">A</th>
+                                        <th className="py-1 border border-black text-xs font-semibold text-black uppercase whitespace-nowrap">S</th>
+                                        <th className="py-1 border border-black text-xs font-semibold text-black uppercase whitespace-nowrap">I</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {attendanceData.map((record, idx) => (
+                                        <tr key={idx} className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}>
+                                            <td className="whitespace-nowrap px-3 border border-black">{record.santri.nama_santri}</td>
+                                            {Array.from({ length: daysInMonth }, (_, i) => (
+                                                <td key={i} className={`px-3 py-1 border border-black text-sm ${record.attendance_data[`day${i + 1}`] === 'HADIR' ? 'font-black text-xl' : ''}`}>{keteranganKehadiranMap[record.attendance_data[`day${i + 1}`]] || ''}</td>
+                                            ))}
+                                            <td className="px-3 py-1 border-l-2 border border-black font-bold text-sm">{record.totalHadir}</td>
+                                            <td className="px-3 py-1 border border-black font-bold text-sm">{record.totalAlpa}</td>
+                                            <td className="px-3 py-1 border border-black font-bold text-sm">{record.totalSakit}</td>
+                                            <td className="px-3 py-1 border border-black font-bold text-sm">{record.totalIzin}</td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+                        <div className="mt-6">
+                            <label className="block mb-2 italic">Unduh Absensi, pilih format file:</label>
+                            <div className="mb-4">
+                                <label className="mr-4">
+                                    <input type="radio" value="image" checked={saveFormat === 'image'} onChange={() => setSaveFormat('image')} /> Foto
+                                </label>
+                                <label>
+                                    <input type="radio" value="excel" checked={saveFormat === 'excel'} onChange={() => setSaveFormat('excel')} /> Excel
+                                </label>
+                            </div>
+                            <button onClick={handleSave} className="p-2 bg-green-500 text-white rounded">Simpan</button>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
