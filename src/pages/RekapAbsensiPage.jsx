@@ -39,8 +39,10 @@ const RekapAbsensiPage = () => {
         'ALPA': 'A',
         'SAKIT': 'S',
         'IZIN': 'I',
+        'LIBUR': '',
         'null': '-'
     };
+
     const singkatanMap = {
         'MADIN':'Madrasah Diniyah Darussaadah',
         'MTS':'Madrasah Tsanawiyah Assaadah',
@@ -229,7 +231,7 @@ const RekapAbsensiPage = () => {
                                         <tr key={idx} className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}>
                                             <td className="whitespace-nowrap px-3 border border-black">{record.santri.nama_santri}</td>
                                             {Array.from({ length: daysInMonth }, (_, i) => (
-                                                <td key={i} className={`px-3 py-1 border border-black text-sm ${record.attendance_data[`day${i + 1}`] === 'HADIR' ? 'font-black text-xl' : ''}`}>{keteranganKehadiranMap[record.attendance_data[`day${i + 1}`]] || ''}</td>
+                                                <td key={i} className={`${record.attendance_data[`day${i + 1}`]} px-3 py-1 border border-black text-sm ${record.attendance_data[`day${i + 1}`] === 'HADIR' ? 'font-black text-xl' : ''} ${record.attendance_data[`day${i + 1}`] === 'LIBUR' ? 'bg-gray-300' : ''}`}>{keteranganKehadiranMap[record.attendance_data[`day${i + 1}`]] || ''}</td>
                                             ))}
                                             <td className="px-3 py-1 border-l-2 border border-black font-bold text-sm">{record.totalHadir}</td>
                                             <td className="px-3 py-1 border border-black font-bold text-sm">{record.totalAlpa}</td>

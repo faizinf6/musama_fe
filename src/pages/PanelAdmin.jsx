@@ -15,8 +15,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import {ToastContainer, toast} from 'react-toastify';
+import {useNavigate} from "react-router-dom";
 
 const convertAndSendExcelData = (file) => {
+
     const reader = new FileReader();
 
     reader.onload = (e) => {
@@ -76,6 +78,7 @@ const queryClient = new QueryClient();
 export const PanelAdmin = () => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [file, setFile] = useState(null);
+    const navigate = useNavigate();
 
     const uploadFile = () => {
         if (file) {
@@ -106,10 +109,12 @@ export const PanelAdmin = () => {
                         Dokumen
                     </p>
                 </div>
-                <div className={`flex flex-col items-center justify-center bg-orange-500 text-white py-5 w-28 rounded-md overflow-hidden shadow-lg shadow-orange-800`}>
+                <div
+                    onClick={()=>{navigate('daftar-admin')}}
+                    className={`flex flex-col items-center justify-center bg-orange-500 text-white py-5 w-28 rounded-md overflow-hidden shadow-lg shadow-orange-800`}>
                     <TableCellsIcon className="h-10 w-10 text-white" aria-hidden="true" />
                     <p className="mt-4 font-bold text-xs text-center">
-                        Pengaturan
+                        Daftar Admin
                     </p>
                 </div>
 

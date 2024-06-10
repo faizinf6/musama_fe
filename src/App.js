@@ -9,6 +9,7 @@ import KalenderLiburPage from "./pages/KalenderLiburPage";
 import AuthRedirect from "./pages/AuthRedirect";
 import {UserProfilePage} from "./pages/UserProfilePage";
 import RekapAbsensiPage from "./pages/RekapAbsensiPage";
+import {DaftarAdminPage} from "./pages/DaftarAdminPage";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
                  <Route path="/kalender-libur" element={< KalenderLiburPage/>} />
                  <Route path="/profil" element={< UserProfilePage/>} />
                  <Route path="/rekap-absensi" element={< RekapAbsensiPage/>} />
+                 <Route path="panel-admin/daftar-admin" element={< DaftarAdminPage/>} />
              </Routes>
 
          </BrowserRouter>
