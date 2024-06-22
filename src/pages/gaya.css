@@ -26,7 +26,27 @@
     0%, 100% { transform: translateY(-25%); }
     50% { transform: translateY(0); }
 }
+@keyframes gradient-border {
+    0% {
+        border-image-source: linear-gradient(45deg, #42a5f5, #478ed1, #42a5f5);
+    }
+    50% {
+        border-image-source: linear-gradient(45deg, #478ed1, #42a5f5, #478ed1);
+    }
+    100% {
+        border-image-source: linear-gradient(45deg, #42a5f5, #478ed1, #42a5f5);
+    }
+}
 
+.animated-gradient-border {
+    display: inline-block;
+    padding: 4px; /* Adjust as needed */
+    border-radius: 12px; /* Rounded corners */
+    animation: gradient-border 3s infinite;
+    border: 4px solid transparent; /* Fallback for older browsers */
+}
 
-
-
+.animated-gradient-border img {
+    display: block;
+    border-radius: 12px; /* Match border radius */
+}

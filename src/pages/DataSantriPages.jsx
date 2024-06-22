@@ -2,18 +2,18 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery } from 'react-query';
 import axios from 'axios';
 import Navbar from "./Navbar";
+import baseURL from "../config";
 
-const fetchStudentsData = (institution, kelas, tahunAjaran, page) => {
+const fetchStudentsData = async (institution, kelas, tahunAjaran, page) => {
     const normalizedInstitution = institution.replace(/\s+/g, '%20').toLowerCase();
     const normalizedKelas = kelas.replace(/\s+/g, '%20').toLowerCase();
     const normalizedTahunAjaran = tahunAjaran;
-    // console.log("Fetching data for:", normalizedInstitution, normalizedKelas, normalizedTahunAjaran);
-    return axios.get(`http://192.168.0.3:5000/${normalizedInstitution}/${normalizedKelas}/${normalizedTahunAjaran}/${page}`);
+    const respond = await axios.get(`${baseURL}/${normalizedInstitution}/${normalizedKelas}/${normalizedTahunAjaran}/${page}`);
+    return respond;
 };
 
 const fetchClasses = async () => {
-    const response = await axios.get('http://localhost:5000/all-kelaslembaga');
-    console.log(response.data)
+    const response = await axios.get(`${baseURL}/all-kelaslembaga`);
     return response.data;
 };
 
@@ -36,29 +36,33 @@ export const DataSantriPages = () => {
         }
     }, [institution, classData, classStatus]);
 
-    // Sorted data based on pemilik, kelas, and gender
+    useEffect(() => {
+        if (institution.toLowerCase() === 'madin') {
+            setTahunAjaran('1445-1446');
+        } else {
+            setTahunAjaran('2023-2024');
+        }
+    }, [institution]);
+
     const sortedData = useMemo(() => {
         if (data?.data) {
             return [...data.data].sort((a, b) => {
-                // Sort by pemilik
                 if (a.pemilik < b.pemilik) return -1;
                 if (a.pemilik > b.pemilik) return 1;
-                // If pemilik is the same, sort by kelas
                 if (a.kelas < b.kelas) return -1;
                 if (a.kelas > b.kelas) return 1;
-                // If kelas is the same, sort by gender
                 return a.santriDetail.gender.localeCompare(b.santriDetail.gender);
             });
         }
         return [];
     }, [data]);
+
     const getClassOptions = () => {
         if (classStatus === 'loading') return ['Loading...'];
         if (classStatus === 'error') return ['Error loading classes'];
 
         let filteredClasses = classData.filter(c => c.pemilik.toLowerCase() === institution.toLowerCase());
 
-        // Sort classes alphabetically unless the institution is 'madin'
         if (institution.toLowerCase() !== 'madin') {
             filteredClasses = filteredClasses.sort((a, b) => a.kelas.localeCompare(b.kelas));
         }
@@ -66,21 +70,27 @@ export const DataSantriPages = () => {
         return filteredClasses.map(c => c.kelas);
     };
 
-    const generateTahunAjaranOptions = () => {
+    const generateTahunAjaranOptions = (Instansi) => {
         let options = [];
-        for (let year = 2023; year <= 2030; year++) {
-            options.push(`${year}-${year + 1}`);
+        if (Instansi.toLowerCase() === 'madin') {
+            for (let year = 1445; year <= 1460; year++) {
+                options.push(`${year}-${year + 1}`);
+            }
+        } else {
+            for (let year = 2023; year <= 2030; year++) {
+                options.push(`${year}-${year + 1}`);
+            }
         }
         return options;
     };
 
     return (
         <>
-            <Navbar/>
+            <Navbar />
             <div className="sticky top-0 bg-white p-4 shadow">
                 <div className="flex gap-4 mb-4">
                     <select onChange={e => setInstitution(e.target.value)} className="form-select px-1 py-3 border border-black shadow-lg bg-white font-bold">
-                        {["Semua Instansi", "Madin", "Ma", "Mts", "Sdi"].map(option => (
+                        {["Pilih Lembaga", "Madin", "Ma", "Mts", "Sdi"].map(option => (
                             <option key={option} value={option}>{option}</option>
                         ))}
                     </select>
@@ -89,8 +99,8 @@ export const DataSantriPages = () => {
                             <option key={option} value={option}>{option}</option>
                         ))}
                     </select>
-                    <select onChange={e => setTahunAjaran(e.target.value)} className="form-select px-1 py-3 border border-black shadow-lg bg-white font-bold">
-                        {generateTahunAjaranOptions().map(option => (
+                    <select value={tahunAjaran} onChange={e => setTahunAjaran(e.target.value)} className="form-select px-1 py-3 border border-black shadow-lg bg-white font-bold">
+                        {generateTahunAjaranOptions(institution).map(option => (
                             <option key={option} value={option}>{option}</option>
                         ))}
                     </select>

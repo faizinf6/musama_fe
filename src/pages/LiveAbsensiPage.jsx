@@ -9,6 +9,7 @@ import Navbar from "./Navbar";
 import {ToastContainer} from "react-toastify";
 import moment from 'moment-timezone';
 import DatePicker from "react-datepicker";
+import {masehiToHijri} from "./RekapAbsensiPage";
 
 
 const KehadiranModal = ({ isOpen, onClose, student, activity, status, onSave }) => {
@@ -96,48 +97,105 @@ const KehadiranModal = ({ isOpen, onClose, student, activity, status, onSave }) 
         </div>
     );
 };
+function getDateParts(date) {
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // getMonth() returns 0-11
+    const year = date.getFullYear();
+
+    return { day, month, year };
+}
 
 export const LiveAbsensiPage = () => {
-    const [schoolName, setSchoolName] = useState(localStorage.getItem('schoolName') || 'Semua');
+    const [lembaga, setLembaga] = useState(localStorage.getItem('schoolName') || 'Semua');
     const [activity, setActivity] = useState(JSON.parse(localStorage.getItem('activity')) || null);
-    const [classes, setClasses] = useState(JSON.parse(localStorage.getItem('classes')) || null);
-    const [academicYear, setAcademicYear] = useState(localStorage.getItem('academicYear') || `${new Date().getFullYear() - 1}-${new Date().getFullYear()}`);
+    const [kelas, setKelas] = useState(JSON.parse(localStorage.getItem('classes')) || null);
+    const [filteredKelas, setFilteredKelas] = useState([]);
+    const [tahunAjaran, setTahunAjaran] = useState(localStorage.getItem('academicYear') || `${new Date().getFullYear() - 1}-${new Date().getFullYear()}`);
+    const [tanggalhijri, setTanggalhijri] = useState('');
     const [attendanceData, setAttendanceData] = useState([]);
     const [intervalId, setIntervalId] = useState(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [selectedDate, setSelectedDate] = useState(moment.tz('Asia/Jakarta').toDate());
+    const namaBulanHijri = ['Muharam', 'Safar', 'Rabiul Awal', 'Rabiul Akhir', 'Jumadil Awal', 'Jumadil Akhir', 'Rajab', 'Syaban', 'Ramadhan', 'Syawal', 'Dzulqodah', 'Dzulhijjah'];
 
-    const { data: activities } = useQuery(['activities', schoolName], () =>
+    const { data: kegiatanData } = useQuery(['activities', lembaga], () =>
         axios.get(`${baseURL}/all-kegiatan`).then(res =>
-            res.data.filter(a => a.pemilik.toLowerCase() === schoolName.toLowerCase())), {
-        enabled: !!schoolName && schoolName !== 'Semua',
+            res.data.filter(a => a.pemilik.toLowerCase() === lembaga.toLowerCase())), {
+        enabled: !!lembaga && lembaga !== 'Semua',
         onSuccess: data => {
             if (data.length && !activity) setActivity(data[0]);
         }
     });
 
-    const { data: classesData } = useQuery(['classes', schoolName], () =>
+    const { data: kelasData } = useQuery(['classes', lembaga], () =>
         axios.get(`${baseURL}/all-kelaslembaga`).then(res =>
-            res.data.filter(c => c.pemilik.toLowerCase() === schoolName.toLowerCase())), {
-        enabled: !!schoolName && schoolName !== 'Semua',
+            res.data.filter(c => c.pemilik.toLowerCase() === lembaga.toLowerCase())), {
+        enabled: !!lembaga && lembaga !== 'Semua',
         onSuccess: data => {
-            if (data.length && !classes) setClasses(data[0]);
+            if (data.length && !kelas) setKelas(data[0]);
         }
     });
 
+    const generateTahunAjaranOptions = (Instansi) => {
+        let options = [];
+        if (Instansi.toLowerCase() === 'madin') {
+            for (let year = 1445; year <= 1460; year++) {
+                options.push(`${year}-${year + 1}`);
+            }
+        } else {
+            for (let year = 2023; year <= 2030; year++) {
+                options.push(`${year}-${year + 1}`);
+            }
+        }
+        return options;
+    };
+
     useEffect(() => {
-        localStorage.setItem('schoolName', schoolName);
+        const currentMoment = moment();
+        const day = currentMoment.date();
+        const month = currentMoment.month() + 1;
+        const year = currentMoment.year();
+
+        const tanggalHijri = masehiToHijri(year, month, day);
+        setTanggalhijri(`${tanggalHijri.day} - ${namaBulanHijri[tanggalHijri.month-1]} - ${tanggalHijri.year}`);
+
+        if (lembaga.toLowerCase() === 'madin') {
+            setTahunAjaran('1445-1446');
+        } else {
+            setTahunAjaran('2023-2024');
+        }
+    }, [lembaga]);
+
+    useEffect(() => {
+        localStorage.setItem('schoolName', lembaga);
         localStorage.setItem('activity', JSON.stringify(activity));
-        localStorage.setItem('classes', JSON.stringify(classes));
-        localStorage.setItem('academicYear', academicYear);
-    }, [schoolName, activity, classes, academicYear]);
+        localStorage.setItem('classes', JSON.stringify(kelas));
+        localStorage.setItem('academicYear', tahunAjaran);
+    }, [lembaga, activity, kelas, tahunAjaran]);
+
+    useEffect(() => {
+        if (activity && Array.isArray(kelasData)) {
+            const newKelasData = kelasData.filter(c => {
+                if (activity.nama_kegiatan.toLowerCase().includes('pagi')) {
+                    return c.kelas.toLowerCase().includes('pagi');
+                } else if (activity.nama_kegiatan.toLowerCase().includes('siang')) {
+                    return c.kelas.toLowerCase().includes('siang');
+                } else {
+                    return true;
+                }
+            });
+            setFilteredKelas(newKelasData);
+            setKelas(newKelasData.length ? newKelasData[0] : null);
+        }
+    }, [activity, kelasData]);
 
     const handleSchoolNameChange = (newSchoolName) => {
-        setSchoolName(newSchoolName);
-        setActivity('');
-        setClasses('');
+        setLembaga(newSchoolName);
+        setActivity(null);
+        setKelas(null);
+        setFilteredKelas([]);
         clearInterval(intervalId);
         setIntervalId(null);
         setIsButtonDisabled(false);
@@ -145,23 +203,27 @@ export const LiveAbsensiPage = () => {
     };
 
     const handleActivityChange = (newActivityId) => {
-        const newActivity = activities.find(a => a.id === parseInt(newActivityId));
+        const newActivity = kegiatanData.find(a => a.id === parseInt(newActivityId));
         setActivity(newActivity);
         clearInterval(intervalId);
         setIntervalId(null);
         setIsButtonDisabled(false);
         console.log('Updated activity:', newActivity);
     };
+
     const handleDateChange = (newDate) => {
-        setSelectedDate(newDate)
+        setSelectedDate(newDate);
+        const dateParts = getDateParts(newDate);
+        const tanggalHijri = masehiToHijri(dateParts.year, dateParts.month, dateParts.day);
+        setTanggalhijri(`${tanggalHijri.day} - ${namaBulanHijri[tanggalHijri.month-1]} - ${tanggalHijri.year}`);
         clearInterval(intervalId);
         setIsButtonDisabled(false);
         setIntervalId(null);
     };
 
     const handleClassChange = (newClassId) => {
-        const newClass = classesData.find(c => c.id === parseInt(newClassId));
-        setClasses(newClass);
+        const newClass = filteredKelas.find(c => c.id === parseInt(newClassId));
+        setKelas(newClass);
         clearInterval(intervalId);
         setIntervalId(null);
         setIsButtonDisabled(false);
@@ -169,16 +231,15 @@ export const LiveAbsensiPage = () => {
     };
 
     const fetchAttendance = () => {
-        if (!activity || !classes) {
+        if (!activity || !kelas) {
             console.error('Select all fields before processing.');
             return;
         }
 
-        const formattedSelecteddate = moment(selectedDate).tz('Asia/Jakarta').format('YYYY-MM-DD') // Format as YYYY-MM-DD
-        const normalizedClassInstitution = classes.kelas.replace(/\s+/g, '%20').toLowerCase();
-        const url = `${baseURL}/get-absensi/${formattedSelecteddate}/${activity.id}/${schoolName}/${normalizedClassInstitution}/${academicYear}/${1}`;
+        const formattedSelectedDate = moment(selectedDate).tz('Asia/Jakarta').format('YYYY-MM-DD');
+        const normalizedClassInstitution = kelas.kelas.replace(/\s+/g, '%20').toLowerCase();
+        const url = `${baseURL}/get-absensi/${formattedSelectedDate}/${activity.id}/${lembaga}/${normalizedClassInstitution}/${tahunAjaran}/${1}`;
         console.log("Fetching data from server...");
-        // console.log(url)
         axios.get(url).then(res => {
             setAttendanceData(res.data);
             setIsButtonDisabled(true);
@@ -203,15 +264,14 @@ export const LiveAbsensiPage = () => {
         fetchAttendance();
         const newIntervalId = setInterval(fetchAttendance, 5000);
         setIntervalId(newIntervalId);
+        console.log(activity);
     };
 
     const handleKehadiranClick = (student) => {
-        console.log(student)
-        if (student.absensi==null)
-        {
-            console.log("data null bang")
-        }else {
-
+        console.log(student);
+        if (student.absensi == null) {
+            console.log("data null bang");
+        } else {
             setSelectedStudent(student);
             setIsModalOpen(true);
         }
@@ -251,35 +311,35 @@ export const LiveAbsensiPage = () => {
                             Live
                         </p>
                     )}
-
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mt-4">
                     <Dropdown
                         label="Lembaga"
-                        value={schoolName}
+                        value={lembaga}
                         options={['Semua', 'sdi', 'mts', 'ma', 'madin'].map(s => ({ value: s, label: s.toUpperCase() }))}
                         onChange={handleSchoolNameChange}
                     />
                     <Dropdown
                         label="Kegiatan"
                         value={activity?.id || ''}
-                        options={(activities || []).map(a => ({ value: a.id, label: a.nama_kegiatan }))}
+                        options={(kegiatanData || []).map(a => ({ value: a.id, label: a.nama_kegiatan }))}
                         onChange={handleActivityChange}
                     />
                     <Dropdown
                         label="Kelas"
-                        value={classes?.id || ''}
-                        options={(classesData || []).map(c => ({ value: c.id, label: c.kelas }))}
+                        value={kelas?.id || ''}
+                        options={filteredKelas.map(c => ({ value: c.id, label: c.kelas }))}
                         onChange={handleClassChange}
                     />
-                    <Dropdown
-                        label="Tahun Ajaran"
-                        value={academicYear}
-                        options={Array.from({ length: 8 }, (_, i) => `${new Date().getFullYear() - 1 + i}-${new Date().getFullYear() + i}`)
-                            .map(y => ({ value: y, label: y }))}
-                        onChange={setAcademicYear}
-                    />
+                    <div>
+                        <label className="block ml-1 text-xs text-gray-500">Tahun Ajaran</label>
+                        <select value={tahunAjaran} onChange={e => setTahunAjaran(e.target.value)} className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline">
+                            {generateTahunAjaranOptions(lembaga).map(option => (
+                                <option key={option} value={option}>{option}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
                 <div className="flex justify-between items-center ">
                     <div>
@@ -290,9 +350,11 @@ export const LiveAbsensiPage = () => {
                             dateFormat="dd-MM-yyyy"
                             className="border p-2 rounded "
                         />
+                        <label className="block ml-1 text-xs  items-center text-gray-900">{tanggalhijri}</label>
                     </div>
+
                     <button
-                        className={`mt-4 px-4 py-2 rounded shadow focus:outline-none ${isButtonDisabled ? 'bg-gray-200 text-gray-300' : 'bg-green-700 text-white'}`}
+                        className={`px-4 py-2 rounded shadow focus:outline-none ${isButtonDisabled ? 'bg-gray-200 text-gray-300' : 'bg-green-700 text-white'}`}
                         onClick={handleProses}
                         disabled={isButtonDisabled}
                     >
@@ -313,7 +375,6 @@ export const LiveAbsensiPage = () => {
         </div>
     );
 };
-
 const Dropdown = ({ label, value, options, onChange }) => (
     <div className="my-1">
         <label className="block ml-1 text-xs text-gray-500">{label}</label>

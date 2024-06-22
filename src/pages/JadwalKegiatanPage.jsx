@@ -1,5 +1,5 @@
 // src/pages/JadwalKegiatanPage.jsx
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useQuery } from 'react-query';
 import { Switch, Tab } from '@headlessui/react';
 import { fetchMesin, fetchKelasLembaga, fetchKegiatan, createKegiatan } from './apiFetch';
@@ -9,6 +9,7 @@ import axios from 'axios';
 import { ArrowPathIcon } from "@heroicons/react/24/solid";
 import baseURL from "../config";
 import {ToastContainer, toast} from 'react-toastify';
+import {validateAdmin} from "./Beranda";
 
 
 export const JadwalKegiatanPage = () => {
@@ -18,7 +19,7 @@ export const JadwalKegiatanPage = () => {
 
     // State for "Tambah" tab
     const [lembaga, setLembaga] = useState('SDI');
-    const [academicYear, setAcademicYear] = useState('2023-2024');
+    const [tahunAjaran, setTahunAjaran] = useState('2023-2024');
     const [namaKegiatan, setNamaKegiatan] = useState('');
     const [jamMulai, setJamMulai] = useState('');
     const [jamSelesai, setJamSelesai] = useState('');
@@ -32,7 +33,19 @@ export const JadwalKegiatanPage = () => {
     // State for "Lihat" tab
     const [lembagaLihat, setLembagaLihat] = useState('Semua');
 
-    const academicYears = Array.from({ length: 8 }, (_, i) => `${2023 + i}-${2024 + i}`);
+    const generateTahunAjaranOptions = (Instansi) => {
+        let options = [];
+        if (Instansi.toLowerCase() === 'madin') {
+            for (let year = 1445; year <= 1460; year++) {
+                options.push(`${year}-${year + 1}`);
+            }
+        } else {
+            for (let year = 2023; year <= 2030; year++) {
+                options.push(`${year}-${year + 1}`);
+            }
+        }
+        return options;
+    };
     const daysOfWeek = [ 'Tidak_Ada','Sabtu', 'Ahad','Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 
     const handleSave = async () => {
@@ -46,7 +59,7 @@ export const JadwalKegiatanPage = () => {
             jam_terlambat: jamTerlambat,
             daftar_mesin: selectedMesin.map(mesin => ({
                 id_mesin: mesin.nis,
-                lokasi_mesin: mesin.nama_admin
+                lokasi_mesin: mesin.rfid
             })),
             peserta: selectedKelasLembaga.map(kelas => ({
                 Kelas: kelas.kelas
@@ -57,7 +70,7 @@ export const JadwalKegiatanPage = () => {
             await createKegiatan(data);
             // Clear all fields if the request is successful
             setLembaga('SDI');
-            setAcademicYear('2023-2024');
+            setTahunAjaran('2023-2024');
             setNamaKegiatan('');
             setJamMulai('');
             setJamSelesai('');
@@ -75,17 +88,32 @@ export const JadwalKegiatanPage = () => {
         }
     };
 
-    const handleStatusChange = async (kegiatan) => {
-        const updatedStatus = !kegiatan.status_kegiatan;
-        try {
-            await axios.patch(`${baseURL}/update-kegiatan`, {
-                ...kegiatan,
-                status_kegiatan: updatedStatus
-            });
-            refetchKegiatan();
-        } catch (error) {
-            console.error("Error updating kegiatan status:", error);
+    useEffect(() => {
+        if (lembaga.toLowerCase() === 'madin') {
+            setTahunAjaran('1445-1446');
+        } else {
+            setTahunAjaran('2023-2024');
         }
+    }, [lembaga]);
+
+    const handleStatusChange = async (kegiatan) => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (validateAdmin(user)){
+            const updatedStatus = !kegiatan.status_kegiatan;
+            try {
+                await axios.patch(`${baseURL}/update-kegiatan`, {
+                    ...kegiatan,
+                    status_kegiatan: updatedStatus
+                });
+                refetchKegiatan();
+            } catch (error) {
+                console.error("Error updating kegiatan status:", error);
+            }
+
+        } else {
+            toast.error(`hanya Admin / Operator yang dapat menonaktifkan kegiatan`, {autoClose: 3100,});
+        }
+
     };
 
     const handleSelectAllKelas = () => {
@@ -98,7 +126,7 @@ export const JadwalKegiatanPage = () => {
     };
 
     const filteredKelas = listKelasLembaga?.filter(
-        kelas => kelas.pemilik.toLowerCase() === lembaga.toLowerCase() && kelas.tahun_ajaran === academicYear
+        kelas => kelas.pemilik.toLowerCase() === lembaga.toLowerCase() && kelas.tahun_ajaran === tahunAjaran
     );
 
     const colorMap = {
@@ -233,10 +261,9 @@ export const JadwalKegiatanPage = () => {
                                     </div>
                                     <div>
                                         <label className="block ml-1 text-xs text-gray-500">Tahun Ajaran</label>
-                                        <select onChange={(e) => setAcademicYear(e.target.value)} value={academicYear}
-                                                className="block px-1 py-3 border-2 bg-white">
-                                            {academicYears.map((year) => (
-                                                <option key={year} value={year}>{year}</option>
+                                        <select value={tahunAjaran} onChange={e => setTahunAjaran(e.target.value)} className="form-select px-1 py-3 border border-black shadow-lg bg-white font-bold">
+                                            {generateTahunAjaranOptions(lembaga).map(option => (
+                                                <option key={option} value={option}>{option}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -321,7 +348,7 @@ export const JadwalKegiatanPage = () => {
                                                             }
                                                         }}
                                                     />
-                                                    {mesin.nama_admin}
+                                                    {mesin.nama_admin} ({mesin.rfid})
                                                 </label>
                                             </div>
                                         ))}

@@ -17,6 +17,7 @@ export const fetchKegiatan = async () => {
 };
 
 export const createKegiatan = async (data) => {
+
     const response = await axios.post(`${baseURL}/create-kegiatan`, data);
     return response.data;
 };

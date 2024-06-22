@@ -8,7 +8,7 @@ import {
     UserMinusIcon,
     UserPlusIcon
 } from "@heroicons/react/16/solid";
-import {useState} from "react";
+import React, {useState} from "react";
 import { Dialog } from '@headlessui/react';
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import 'react-toastify/dist/ReactToastify.css';
@@ -16,6 +16,8 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 import {ToastContainer, toast} from 'react-toastify';
 import {useNavigate} from "react-router-dom";
+import baseURL from "../config";
+import {UnggahFileExcelPage} from "./TesUploudFilePage";
 
 const convertAndSendExcelData = (file) => {
 
@@ -59,7 +61,7 @@ const convertAndSendExcelData = (file) => {
         });
         console.log(json_data)
 
-        axios.post('http://localhost:5000/create-santri-banyak', json_data)
+        axios.post(`${baseURL}/create-santri-banyak`, json_data)
             .then(response => {console.log('Upload successful:', response)
                 toast.success("Berhasil!",{autoClose:1000})
             })
@@ -103,7 +105,9 @@ export const PanelAdmin = () => {
                     </p>
                 </div>
 
-                <div className={`flex flex-col items-center justify-center bg-orange-500 text-white py-5 w-28 rounded-md overflow-hidden shadow-lg shadow-orange-800`}>
+                <div
+                    onClick={()=>{navigate('tambah-santri')}}
+                    className={`flex flex-col items-center justify-center bg-orange-500 text-white py-5 w-28 rounded-md overflow-hidden shadow-lg shadow-orange-800`}>
                     <DocumentChartBarIcon className="h-10 w-10 text-white" aria-hidden="true" />
                     <p className="mt-4 font-bold text-xs text-center">
                         Dokumen
@@ -134,18 +138,7 @@ export const PanelAdmin = () => {
                             <XMarkIcon className="h-5 w-5" />
                         </button>
 
-                        <Dialog.Title className="mb-3 font-bold text-xl">Upload File</Dialog.Title>
-                        <input
-                            type="file"
-                            accept=".xlsx"
-                            onChange={event => setFile(event.target.files[0])}
-                        />
-                        <button
-                            className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg"
-                            onClick={uploadFile}
-                        >
-                            Upload
-                        </button>
+                        <UnggahFileExcelPage/>
                     </Dialog.Panel>
                 </div>
             </Dialog>

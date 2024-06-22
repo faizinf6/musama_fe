@@ -10,6 +10,8 @@ import {
 } from "@heroicons/react/16/solid";
 import {useNavigate} from "react-router-dom";
 import {useEffect} from "react";
+import {ToastContainer, toast} from 'react-toastify';
+
 
 function Beranda() {
 
@@ -19,6 +21,7 @@ function Beranda() {
     return (
       <div>
           <Navbar/>
+          <ToastContainer></ToastContainer>
           <div className="flex flex-col items-center justify-center">
               <h1 className="text-l italic font-bold mt-4">Selamat datang, {user?.nama_admin}</h1>
           </div>
@@ -32,12 +35,12 @@ function Beranda() {
                   }>
                       Santri
                   </Tab>
-                  <Tab as="button" className={({ selected }) =>
-                      selected ? "bg-white text-orange-500 w-full rounded-lg p-2.5 font-bold" :
-                          "text-blue-100 hover:bg-white/[0.12] w-full rounded-lg p-2.5"
-                  }>
-                      Guru
-                  </Tab>
+                  {/*<Tab as="button" className={({ selected }) =>*/}
+                  {/*    selected ? "bg-white text-orange-500 w-full rounded-lg p-2.5 font-bold" :*/}
+                  {/*        "text-blue-100 hover:bg-white/[0.12] w-full rounded-lg p-2.5"*/}
+                  {/*}>*/}
+                  {/*    Guru*/}
+                  {/*</Tab>*/}
                   <Tab as="button" className={({ selected }) =>
                       selected ? "bg-white text-red-500 w-full rounded-lg p-2.5 font-bold" :
                           "text-blue-100 hover:bg-white/[0.12] w-full rounded-lg p-2.5"
@@ -95,56 +98,56 @@ function Beranda() {
 
                   </Tab.Panel>
                   {/* Guru Panel */}
-                  <Tab.Panel className="bg-white rounded-xl p-3">
+                  {/*<Tab.Panel className="bg-white rounded-xl p-3">*/}
 
 
-                      <a onClick={()=>{navigate('/data-murid') }}>
-                          <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-orange-400">
-                              <div className="shrink-0">
-                                  <UsersIcon className="h-10 w-10" aria-hidden="true" color="orange" />
+                  {/*    <a onClick={()=>{navigate('/data-murid') }}>*/}
+                  {/*        <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-orange-400">*/}
+                  {/*            <div className="shrink-0">*/}
+                  {/*                <UsersIcon className="h-10 w-10" aria-hidden="true" color="orange" />*/}
 
-                              </div>
+                  {/*            </div>*/}
 
-                              <div>
-                                  <div className="text-xl font-medium text-black">Data Guru</div>
-                                  <p className="text-slate-500">Tambah, Hapus dan Edit Data Guru disini </p>
-                              </div>
+                  {/*            <div>*/}
+                  {/*                <div className="text-xl font-medium text-black">Data Guru</div>*/}
+                  {/*                <p className="text-slate-500">Tambah, Hapus dan Edit Data Guru disini </p>*/}
+                  {/*            </div>*/}
 
-                          </div>
-                      </a>
-                      <a onClick={()=>{navigate('/data-murid') }}>
-                          <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-orange-400">
-                              <div className="shrink-0">
-                                  <ClipboardDocumentCheckIcon className="h-10 w-10" aria-hidden="true" color="orange" />
+                  {/*        </div>*/}
+                  {/*    </a>*/}
+                  {/*    <a onClick={()=>{navigate('/data-murid') }}>*/}
+                  {/*        <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-orange-400">*/}
+                  {/*            <div className="shrink-0">*/}
+                  {/*                <ClipboardDocumentCheckIcon className="h-10 w-10" aria-hidden="true" color="orange" />*/}
 
-                              </div>
+                  {/*            </div>*/}
 
-                              <div>
-                                  <div className="text-xl font-medium text-black">Absensi / Presensi</div>
-                                  <p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>
-                              </div>
+                  {/*            <div>*/}
+                  {/*                <div className="text-xl font-medium text-black">Absensi / Presensi</div>*/}
+                  {/*                <p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>*/}
+                  {/*            </div>*/}
 
-                          </div>
-                      </a>
-                      <a onClick={()=>{navigate('/data-murid') }}>
-                          <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-orange-400">
-                              <div className="shrink-0">
-                                  <PresentationChartBarIcon className="h-10 w-10" aria-hidden="true" color="orange" />
+                  {/*        </div>*/}
+                  {/*    </a>*/}
+                  {/*    <a onClick={()=>{navigate('/data-murid') }}>*/}
+                  {/*        <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-orange-400">*/}
+                  {/*            <div className="shrink-0">*/}
+                  {/*                <PresentationChartBarIcon className="h-10 w-10" aria-hidden="true" color="orange" />*/}
 
-                              </div>
+                  {/*            </div>*/}
 
-                              <div>
-                                  <div className="text-xl font-medium text-black">Rekap & Laporan</div>
-                                  <p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>
-                              </div>
+                  {/*            <div>*/}
+                  {/*                <div className="text-xl font-medium text-black">Rekap & Laporan</div>*/}
+                  {/*                <p className="text-slate-500">Tambah, Hapus dan Edit Data Murid disini </p>*/}
+                  {/*            </div>*/}
 
-                          </div>
-                      </a>
+                  {/*        </div>*/}
+                  {/*    </a>*/}
 
-                  </Tab.Panel>
+                  {/*</Tab.Panel>*/}
                   {/* Admin Panel */}
                   <Tab.Panel className="bg-white rounded-xl p-3">
-                      <a onClick={()=>{navigate('/data-murid') }}>
+                      <a onClick={()=>{navigate('/status-mesin') }}>
                           <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-red-500">
                               <div className="shrink-0">
                                   <CalculatorIcon className="h-10 w-10 text-red-500" aria-hidden="true" />
@@ -204,7 +207,20 @@ function Beranda() {
                       {/*    </div>*/}
                       {/*</a>*/}
 
-                      <a onClick={()=>{navigate('/panel-admin') }}>
+                      <a onClick={()=>{
+                          if (validateAdmin(user)){
+                          navigate('/panel-admin')
+
+                          }else {
+                              toast.error(`Anda Bukan Admin / Operator Musama`, {autoClose: 3100,});
+
+                          }
+
+
+
+                      }
+
+                      }>
                           <div className="mr-3 ml-3 mt-3 p-6 max-w-lg mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4 border border-red-500">
                               <div className="shrink-0">
                                   <ShieldCheckIcon className="h-10 w-10 text-red-500" aria-hidden="true" />
@@ -233,9 +249,11 @@ function Beranda() {
 
 
 }
-// Add this function inside your Tab component
-
-
-
-
 export default Beranda;
+
+export function validateAdmin(dataAdmin){
+    if (dataAdmin){
+        return dataAdmin.kategori <= 2;
+    }
+
+}
